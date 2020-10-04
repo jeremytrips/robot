@@ -6,6 +6,8 @@ from emulator.logger.logger import LOG, WARN
 class Pin:
 
     def __init__(self, pin_number, direction, initial=False):
+        if pin_number < 0:
+            raise Exception(f"Pin must be positive got {pin_number}")
         self.__pin = pin_number
         self.__direction = direction
         self.__state = initial

@@ -26,7 +26,10 @@ class InfraRedSensor:
             callback=self._ir_sensor_event,
             debouncetime=300
         )
-
+    
+    @property
+    def state(self):
+        return GPIO.input(self._pin)
 
     def _ir_sensor_event(self):
         raise NotImplementedError()
