@@ -46,6 +46,14 @@ class Logger:
             logs += log
         logs += bcolors.ENDC
         print(logs)
+    
+    def error(self, *args):
+        logs = bcolors.FAIL + "[EMULATOR:WARN] "
+        for log in args:
+            logs += str(log)
+        logs += bcolors.ENDC
+        print(logs)
+        sys.exit()
 
     def log_once(self, *args):
         logs = bcolors.HEADER + "[ROBOT:LOG] "
@@ -68,4 +76,4 @@ class Logger:
 LOG = Logger.get().log
 WARN = Logger.get().warn
 WARN_ONCE = Logger.get().warn_once
-
+ERROR = Logger.get().error

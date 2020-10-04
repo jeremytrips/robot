@@ -26,9 +26,9 @@ class Robot:
         self.__front_distance = int(0)
 
         self.__front_sensor = UltraSonicSensor("front", 2, 5)
+        self.__left_junction_ir_sensor = JunctionInfraRedSensor("left", 7)
         self.__left_line_ir_sensor = LineInfraRedSensor("left", 8)
         self.__right_line_ir_sensor = LineInfraRedSensor("right", 9)
-        self.__left_junction_ir_sensor = JunctionInfraRedSensor("left", 7)
         self.__right_junction_ir_sensor = JunctionInfraRedSensor("right", 10)
 
         self.__pipe = Pipe()
@@ -59,14 +59,12 @@ class Robot:
                 self.__pipe.write("Tournant a droite")
             elif self.__right_junction_ir_sensor.state == False :       #xx10
                 if self.__left_line_ir_sensor.state == False :          #x010
-                    self.__pipe.write("Redirect vers la droite")
+                    self.__pipe.write("Redirect a droite")
                 else :                                                  #x110
                     if self.__left_junction_ir_sensor.state == False :  #0110
                         self.__pipe.write("Tout droit")
                     else :                                              #1110
                         self.__pipe.write("Tournant a gauche")
-            else :
-                ERROR("Unexpected argument at _line_ir_event", position)
 
 
         #Si "left" == True, alors x1xx et donc :
@@ -76,7 +74,7 @@ class Robot:
         #1110 --- Tournant a gauche mais incliné a droite, donc dépend de US et redirection ou tournant
         #0100 --- Redirection vers la gauche
         #0110 --- on espère que ça arrive pas -- tout droit
-        #0101 --- chelou mais redirect a gauche
+        #0101 --- chelou mais tout droit
         #0111 --- chelou mais tournant a droite en fait
 
         elif position == "left" :                                       #x1xx
@@ -84,7 +82,10 @@ class Robot:
                 self.__pipe.write("Tournant a gauche")
             else :                                                      #01xx 
                 if self.__right_line_ir_sensor.state == False :         #010x
-                    self.__pipe.write("Redirect a gauche")
+                    if self.__right_junction_ir_sensor.state :                #0101
+                        self.__pipe.write("Tout droit")                 
+                    else :                                              #0100    
+                        self.__pipe.write("Redirect a gauche")
                 else :                                                  #011x
                     if self.__right_junction_ir_sensor.state :          #0111
                         self.__pipe.write("Tournant a droite")
@@ -92,19 +93,72 @@ class Robot:
                         self.__pipe.write("Tout droit")
 
 
-
-
         else:
             ERROR("Unexpected argument at _line_ir_event", position)
-        WARN("_line_ir_event not defined yet.")
+        #WARN("_line_ir_event not defined yet.")
 
+    #Si left == true, alors : 1xxx
+    #1000 --- chelou, mais redirection vers la gauche (car ça implique qu'il y a un tournant a gauche perçu avant le capteur central gauche, donc incliné vers la droite)
+    #1001 --- zero sens, go tout droit
+    #1010 --- chelou, mais redirection vers la gauche
+    #1011 --- chelou, devrait pas arriver, mais -- tournant a droite
+    #1100 --- Tournant a gauche -- depend du US
+    #1101 --- Chelou, devrait pas arriver -- Tournant a gauche -- depend du US
+    #1110 --- Tournant a gauche mais incliné a droite, donc dépend de US et redirection ou tournant
+    #1111 --- Carrefour, tournant a droite
 
     def _junction_ir_event(self, position):
         # todo handle the reception of the message and react in consequence. Rotate 90° 
-        self.__left_line_ir_sensor.remove_event()
-        WARN("_junction_ir_event not defined yet.")
+        #self.__left_line_ir_sensor.remove_event()
+        #WARN("_junction_ir_event not defined yet.")
+        if position == "left" :                                                                     #1xxx
+            if self.__left_line_ir_sensor.state :                                                   #11xx
+                if self.__right_line_ir_sensor.state and self.__right_junction_ir_sensor.state :    #1111
+                    self.__pipe.write("Tournant a droite")
+                #elif US
+                else :                                                                  #1100, 1101 et 1110
+                    self.__pipe.write("Tournant a gauche")
+            else :                                                                                  #10xx
+                if self.__right_line_ir_sensor.state :                                              #101x
+                    if self.__right_junction_ir_sensor :                                            #1011
+                        self.__pipe.write("Tournant a droite")
+                    else :                                                                          #1010
+                        self.__pipe.write("Redirect a gauche")
+                else :                                                                              #100x
+                    if self.__right_junction_ir_sensor.state :                                      #1001
+                        self.__pipe.write("Tout droit")
+                    else :
+                        self.__pipe.write("Redirect a gauche")
+        
 
-        self.__left_line_ir_sensor.add_event_detect()
+        #si right == True, alors xxx1 :
+        #0001 --- chelou, mais redirect droit 
+        #0011 --- tournant droit
+        #0111 --- tournant droit
+        #1111 --- carrefour -- tournant droit
+        #0101 --- tout droit (chelou)
+        #1001 --- zero sens go tout droit
+        #1011 --- chelou mais tournant droit
+        #1101 --- chelou mais tournant gauche (selon US)
+
+        elif position == "right" :                                    #xxx1
+            if self.__right_line_ir_sensor.state :                          #xx11
+                self.__pipe.write("Tournant a droite")
+            else :                                                          #xx01
+                if self.__left_line_ir_sensor.state :                           #x101
+                    if self.__left_junction_ir_sensor.state :                       #1101
+                        self.__pipe.write("Tournant a gauche")
+                    else :                                                          #0101
+                        self.__pipe.write("Tout droit")
+                else :                                                          #x001
+                    if self.__left_junction_ir_sensor.state :                       #1001
+                        self.__pipe.write("Tout droit")
+                    else :                                                          #0001
+                        self.__pipe.write("Redirect a droite")
+                    
+        else:
+            ERROR("Unexpected argument at _line_ir_event", position)
+        #self.__left_line_ir_sensor.add_event_detect()
 
     def _us_event(self):
         # todo rotate of 180° the robot
