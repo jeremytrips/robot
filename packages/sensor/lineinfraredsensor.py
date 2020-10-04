@@ -10,4 +10,5 @@ class LineInfraRedSensor(InfraRedSensor):
         super(LineInfraRedSensor, self).__init__(position, pin)
 
     def _ir_sensor_event(self):
+        self._state = True
         pub.sendMessage("line_ir_sensor_event", position=self._position)

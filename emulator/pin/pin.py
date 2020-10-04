@@ -32,7 +32,6 @@ class Pin:
 
     @state.setter
     def state(self, value):
-        LOG(self.__state)
         self.__old_state = self.__state
         self.__state = value
 
