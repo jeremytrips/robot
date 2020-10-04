@@ -1,0 +1,44 @@
+#:import Window kivy.core.window.Window
+
+<StateIndicator>:
+
+<PinLayout>:
+    padding: [5, 5]
+    orientation: "vertical"
+    size_hint_y: None
+    height: 64
+    canvas:
+        Color:
+            rgba: [1, 1, 1, 0.5]
+        Rectangle:
+            pos: self.pos
+            size: self.width, self.height
+    Label:
+        text: root.pin_number
+    Label:
+        text: root.direction_label
+    StateIndicator:
+        size: 32, 32
+        size_hint: None, None
+        state: "down"
+        on_press: root._handle_toggle(self.state)
+
+
+<MainLayout>:
+    cols: 3
+    spacing: 10
+    size_hint_y: 1
+    size_hint_x: 0.5
+
+BoxLayout:
+    id: "root_layout"
+    BoxLayout:
+        orientation: 'vertical'
+        size_hint_x: 0.5
+        TextInput:
+            text: "BITE"
+        Label:
+            size_hint_y: 0.2
+            text: "Rouge = 0 logique\nVert = 1 logique"
+    MainLayout
+

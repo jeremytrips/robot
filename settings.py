@@ -1,0 +1,8 @@
+END_CHAR = "%"
+
+SERIAL_PORT = ""
+
+DEBUG = True
+
+DISTANCE_LOW = 15
+DISTANCE_HIGH = 20
