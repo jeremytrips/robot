@@ -25,7 +25,7 @@ class Robot:
         self.__run = False
         self.__front_distance = int(0)
 
-        self.__front_sensor = UltraSonicSensor("front", 2, 5)
+        self.__front_sensor = UltraSonicSensor("front", 23, 24)
         self.__left_junction_ir_sensor = JunctionInfraRedSensor("left", 7)
         self.__left_line_ir_sensor = LineInfraRedSensor("left", 8)
         self.__right_line_ir_sensor = LineInfraRedSensor("right", 9)
@@ -40,7 +40,7 @@ class Robot:
         while True:
             time.sleep(0.1)
 
-
+        self.__front_sensor.distance
 
     def _line_ir_event(self, position):
         # todo handle the reception of the message and react in consequence.
@@ -64,7 +64,10 @@ class Robot:
                     if self.__left_junction_ir_sensor.state == False :  #0110
                         self.__pipe.write("Tout droit")
                     else :                                              #1110
-                        self.__pipe.write("Tournant a gauche")
+                        if self.__front_sensor.distance < 15 :
+                            self.__pipe.write("Tournant a gauche")
+                        else : 
+                            self.__pipe.write("Redirect a droite")
 
 
         #Si "left" == True, alors x1xx et donc :
@@ -79,10 +82,19 @@ class Robot:
 
         elif position == "left" :                                       #x1xx
             if self.__left_junction_ir_sensor.state :                   #11xx
-                self.__pipe.write("Tournant a gauche")
+                if self.__front_sensor.distance < 15 :
+                    self.__pipe.write("Tournant a gauche")
+                else : 
+                    if self.__right_line_ir_sensor.state == False :     #110x
+                        self.__pipe.write("Redirect a gauche")
+                    else :                                              #111x
+                        if self.__right_junction_ir_sensor :        #1111
+                            self.__pipe.write("Tournant a droite")
+                        else :                                      #1110
+                            self.__pipe.write("Redirect a droite")
             else :                                                      #01xx 
                 if self.__right_line_ir_sensor.state == False :         #010x
-                    if self.__right_junction_ir_sensor.state :                #0101
+                    if self.__right_junction_ir_sensor.state :          #0101
                         self.__pipe.write("Tout droit")                 
                     else :                                              #0100    
                         self.__pipe.write("Redirect a gauche")
@@ -115,9 +127,17 @@ class Robot:
             if self.__left_line_ir_sensor.state :                                                   #11xx
                 if self.__right_line_ir_sensor.state and self.__right_junction_ir_sensor.state :    #1111
                     self.__pipe.write("Tournant a droite")
-                #elif US
-                else :                                                                  #1100, 1101 et 1110
-                    self.__pipe.write("Tournant a gauche")
+                else :                                                                              #1100, 1101 et 1110
+                    if self.__front_sensor.distance < 15 :
+                        self.__pipe.write("Tournant a gauche")
+                    else :
+                        if self.__right_junction_ir_sensor.state :                  #1101
+                            self.__pipe.write("Redirect a gauche")
+                        else :                                                              
+                            if self.__right_line_ir_sensor.state  :                 #1110
+                                self.__pipe.write("Redirect a droite")
+                            else :                                                  #1100
+                                self.__pipe.write("Tout droit")
             else :                                                                                  #10xx
                 if self.__right_line_ir_sensor.state :                                              #101x
                     if self.__right_junction_ir_sensor :                                            #1011
@@ -147,7 +167,10 @@ class Robot:
             else :                                                          #xx01
                 if self.__left_line_ir_sensor.state :                           #x101
                     if self.__left_junction_ir_sensor.state :                       #1101
-                        self.__pipe.write("Tournant a gauche")
+                        if self.__front_sensor.distance < 15 :
+                            self.__pipe.write("Tournant a gauche")
+                        else : 
+                            self.__pipe.write("Redirect a gauche")
                     else :                                                          #0101
                         self.__pipe.write("Tout droit")
                 else :                                                          #x001
@@ -162,5 +185,5 @@ class Robot:
 
     def _us_event(self):
         # todo rotate of 180° the robot
-        WARN_ONCE("_us_event not defined yet.")
+        self.__pipe.write("Mur en face")
         self.__front_distance = self.__front_sensor.distance

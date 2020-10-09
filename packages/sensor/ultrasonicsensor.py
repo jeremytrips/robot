@@ -27,7 +27,8 @@ class UltraSonicSensor:
     def measure(self):
         while True:
             self._get_average()
-            self._us_sensor_event()
+            if self.__distance < 5 :
+                pub.sendMessage("us_sensor_event")
             time.sleep(0.2)
 
     def _get_distance(self):
