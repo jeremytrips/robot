@@ -47,10 +47,10 @@ class Robot:
         #Si "right" == True, alors xx1x et donc :
         #0010 --- redirect vers la droite (1,0.8)
         #0011 --- tournant a droite
-        #0111 --- tournant a droite et gauche mais incliné a gauche (donc tournant a droite)
+        #0111 --- tournant a droite et gauche mais incline a gauche (donc tournant a droite)
         #1011 --- chelou, devrait pas arriver, mais -- tournant a droite
         #1111 --- carrefour -- tournant a droite
-        #0110 --- on espère que ça arrive pas -- tout droit
+        #0110 --- on espere que ca arrive pas -- tout droit
         #1110 --- chelou mais tournant a gauche si pas US
         #1010 --- chelou mais redirect vers la droite
 
@@ -74,9 +74,9 @@ class Robot:
         #1100 --- Tournant a gauche -- depend du US
         #1101 --- Chelou, devrait pas arriver -- Tournant a gauche -- depend du US
         #1111 --- Carrefour, tournant a droite
-        #1110 --- Tournant a gauche mais incliné a droite, donc dépend de US et redirection ou tournant
+        #1110 --- Tournant a gauche mais incline a droite, donc depend de US et redirection ou tournant
         #0100 --- Redirection vers la gauche
-        #0110 --- on espère que ça arrive pas -- tout droit
+        #0110 --- on espere que ca arrive pas -- tout droit
         #0101 --- chelou mais tout droit
         #0111 --- chelou mais tournant a droite en fait
 
@@ -110,17 +110,17 @@ class Robot:
         #WARN("_line_ir_event not defined yet.")
 
     #Si left == true, alors : 1xxx
-    #1000 --- chelou, mais redirection vers la gauche (car ça implique qu'il y a un tournant a gauche perçu avant le capteur central gauche, donc incliné vers la droite)
+    #1000 --- chelou, mais redirection vers la gauche (car ca implique qu'il y a un tournant a gauche percu avant le capteur central gauche, donc incline vers la droite)
     #1001 --- zero sens, go tout droit
     #1010 --- chelou, mais redirection vers la gauche
     #1011 --- chelou, devrait pas arriver, mais -- tournant a droite
     #1100 --- Tournant a gauche -- depend du US
     #1101 --- Chelou, devrait pas arriver -- Tournant a gauche -- depend du US
-    #1110 --- Tournant a gauche mais incliné a droite, donc dépend de US et redirection ou tournant
+    #1110 --- Tournant a gauche mais incline a droite, donc depend de US et redirection ou tournant
     #1111 --- Carrefour, tournant a droite
 
     def _junction_ir_event(self, position):
-        # todo handle the reception of the message and react in consequence. Rotate 90° 
+        # todo handle the reception of the message and react in consequence. Rotate 90 
         #self.__left_line_ir_sensor.remove_event()
         #WARN("_junction_ir_event not defined yet.")
         if position == "left" :                                                                     #1xxx
@@ -184,6 +184,6 @@ class Robot:
         #self.__left_line_ir_sensor.add_event_detect()
 
     def _us_event(self):
-        # todo rotate of 180° the robot
+        # todo rotate of 180 the robot
         self.__pipe.write("Mur en face")
         self.__front_distance = self.__front_sensor.distance
