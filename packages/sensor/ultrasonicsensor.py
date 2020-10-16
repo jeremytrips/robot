@@ -9,6 +9,7 @@ if settings.DEBUG:
 else:
     import RPi.GPIO as GPIO
 
+GPIO.setmode(GPIO.BCM)
 
 class UltraSonicSensor:
 

@@ -1,6 +1,7 @@
 from .infraredsensor import InfraRedSensor
 from pubsub import pub
 
+GPIO.setmode(GPIO.BCM)
 
 class JunctionInfraRedSensor(InfraRedSensor):
 

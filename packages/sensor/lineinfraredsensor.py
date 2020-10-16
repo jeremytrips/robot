@@ -3,6 +3,7 @@ import pubsub.pub as pub
 
 from ..logger.logger import LOG
 
+GPIO.setmode(GPIO.BCM)
 
 class LineInfraRedSensor(InfraRedSensor):
 
