@@ -3,6 +3,8 @@ import pubsub.pub as pub
 
 from ..logger.logger import LOG
 
+import settings
+
 if settings.DEBUG:
     from emulator.RPi.GPIO import GPIO
 else:
