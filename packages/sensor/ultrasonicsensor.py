@@ -9,11 +9,10 @@ if settings.DEBUG:
 else:
     import RPi.GPIO as GPIO
 
-GPIO.setmode(GPIO.BCM)
-
 class UltraSonicSensor:
 
     def __init__(self, position, gpio_trigger, gpio_echo):
+        GPIO.setmode(GPIO.BCM)
         self.__position = position
         self.__front_distance = int(0)
         self.__gpio_trigger = gpio_trigger
