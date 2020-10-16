@@ -13,7 +13,7 @@ import settings
 if settings.DEBUG:
     from emulator.RPi.GPIO import GPIO
 else:
-    from RPi.GPIO import GPIO
+    import RPi.GPIO as GPIO
 
 
 class Robot:

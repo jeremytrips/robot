@@ -7,7 +7,7 @@ if settings.DEBUG:
     from emulator.RPi.GPIO import GPIO
     import random
 else:
-    from RPi.GPIO import GPIO
+    import RPi.GPIO as GPIO
 
 
 class UltraSonicSensor:
