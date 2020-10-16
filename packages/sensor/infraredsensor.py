@@ -24,7 +24,6 @@ class InfraRedSensor:
             self._pin,
             GPIO.RISING,
             callback=self._ir_sensor_event,
-            debouncetime=300
         )
     
     @property
