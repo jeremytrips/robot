@@ -14,4 +14,4 @@ class LineInfraRedSensor(InfraRedSensor):
         pub.sendMessage("line_ir_sensor_event", position=self._position)
 
     def get_state(self):
-        return f"ir sensor {self._position} {self.__type} \t\t {self.state}"
+        return f"\033[92mir sensor {self._position} {self.__type}\033[0m\t\t {self.state}"

@@ -86,4 +86,4 @@ class UltraSonicSensor(Sensor):
         return self.__distance
 
     def get_state(self):
-        return "Front sensor distance: \t " + str(self.__distance) + "cm"
+        return "\033[92mFront sensor distance: \033[0m\t" + str(self.__distance) + "cm"

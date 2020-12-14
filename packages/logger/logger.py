@@ -35,50 +35,45 @@ class Logger:
         self._log_once = []
 
     def log(self, *args):
-        logs = bcolors.HEADER + "[ROBOT:LOG] "
+        logs = "\033[K" + bcolors.HEADER + "[ROBOT:LOG] "
         for log in args:
             logs += str(log)
-        logs += bcolors.ENDC
-        sys.stdout.write("\033[K")
-        print(logs)
+        logs += bcolors.ENDC + "\n"
+        sys.stdout.write(logs)
 
     def warn(self, *args):
-        logs = bcolors.WARNING + "[ROBOT:WARN] "
+        logs = "\033[K" + bcolors.WARNING + "[ROBOT:WARN] "
         for log in args:
             logs += str(log)
-        logs += bcolors.ENDC
-        sys.stdout.write("\033[K")
-        print(logs)
+        logs += bcolors.ENDC + "\n"
+        sys.stdout.write(logs)
     
     def error(self, *args):
-        logs = bcolors.FAIL + "[EMULATOR:WARN] "
+        logs = "\033[K" + bcolors.FAIL + "[EMULATOR:WARN] "
         for log in args:
             logs += str(log)
-        logs += bcolors.ENDC
-        sys.stdout.write("\033[K")
-        print(logs)
+        logs += bcolors.ENDC + "\n"
+        sys.stdout.write(logs)
         input("Touch any key to quit")
         sys.exit()
 
     def log_once(self, *args):
-        logs = bcolors.HEADER + "[ROBOT:LOG] "
+        logs = "\033[K" + bcolors.HEADER + "[ROBOT:LOG] "
         for log in args:
             logs += str(log)
-        logs += bcolors.ENDC
+        logs += bcolors.ENDC + "\n"
         if logs not in self._log_once:
             self._log_once.append(logs)
-            sys.stdout.write("\033[K")
-            print(logs)
+            sys.stdout.write(logs)
 
     def warn_once(self, *args):
-        logs = bcolors.WARNING + "[ROBOT:WARN] "
+        logs = "\033[K" + bcolors.WARNING + "[ROBOT:WARN] "
         for log in args:
             logs += str(log)
         logs += bcolors.ENDC + "\n"
         if logs not in self._warn_once:
             self._warn_once.append(logs)
-            sys.stdout.write("\033[K")
-            print(logs)
+            sys.stdout.write(logs)
 
 LOG = Logger.get().log
 WARN = Logger.get().warn
