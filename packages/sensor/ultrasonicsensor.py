@@ -12,7 +12,6 @@ if settings.USE_EMULATOR:
 else:
     import RPi.GPIO as GPIO
 
-
 class UltraSonicSensor(Sensor):
 
     def __init__(self, position, gpio_trigger, gpio_echo):

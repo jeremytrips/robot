@@ -7,6 +7,7 @@ if settings.USE_EMULATOR:
 else:
     import RPi.GPIO as GPIO
 
+GPIO.setmode(GPIO.BCM)
 
 class InfraRedSensor(Sensor):
 

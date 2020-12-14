@@ -17,6 +17,7 @@ if settings.USE_EMULATOR:
 else:
     import RPi.GPIO as GPIO
 
+GPIO.setmode(GPIO.BCM)
 
 class Robot:
 
@@ -35,7 +36,7 @@ class Robot:
 
         self.__pipe = Pipe()
         pub.subscribe(listener=self._line_ir_event, topicName='line_ir_sensor_event')
-        pub.subscribe(listener=self._junction_ir_event, topicName='junction_ir_sensor_event')
+        pub.subscribe(listener=self._junction_ir_event_handler, topicName='junction_ir_sensor_event')
         pub.subscribe(listener=self._us_event, topicName='us_sensor_event')
         if settings.DEBUG:
             Thread(target=self.debug_thread).start()
@@ -135,7 +136,7 @@ class Robot:
     #1110 --- Tournant a gauche mais incline a droite, donc depend de US et redirection ou tournant
     #1111 --- Carrefour, tournant a droite
 
-    def _junction_ir_event(self, position):
+    def _junction_ir_event_handler(self, position):
         # todo handle the reception of the message and react in consequence. Rotate 90 
         #self.__left_line_ir_sensor.remove_event()
         #WARN("_junction_ir_event not defined yet.")

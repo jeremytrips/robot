@@ -3,6 +3,14 @@ import pubsub.pub as pub
 
 from ..logger.logger import LOG
 
+import settings
+
+if settings.DEBUG:
+    from emulator.RPi.GPIO import GPIO
+else:
+    import RPi.GPIO as GPIO
+
+GPIO.setmode(GPIO.BCM)
 
 class LineInfraRedSensor(InfraRedSensor):
 
