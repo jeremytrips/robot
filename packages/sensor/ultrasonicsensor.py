@@ -3,21 +3,26 @@ from threading import Thread
 import time
 
 from pubsub import pub
-if settings.DEBUG:
+from packages.logger.logger import LOG
+from packages.sensor.sensor import Sensor
+
+if settings.USE_EMULATOR:
     from emulator.RPi.GPIO import GPIO
     import random
 else:
-    from RPi.GPIO import GPIO
+    import RPi.GPIO as GPIO
 
 
-class UltraSonicSensor:
+class UltraSonicSensor(Sensor):
 
     def __init__(self, position, gpio_trigger, gpio_echo):
+        GPIO.setmode(GPIO.BCM)
         self.__position = position
         self.__front_distance = int(0)
         self.__gpio_trigger = gpio_trigger
         self.__gpio_echo = gpio_echo
         self.__distance = int(0)
+        self.__run = True
 
         GPIO.setup(gpio_trigger, GPIO.OUT)
         GPIO.setup(gpio_echo, GPIO.IN)
@@ -25,14 +30,17 @@ class UltraSonicSensor:
         Thread(target=self.measure).start()
     
     def measure(self):
-        while True:
+        while self.__run:
             self._get_average()
             if self.__distance < 5 :
                 pub.sendMessage("us_sensor_event")
             time.sleep(0.2)
 
+    def kill(self):
+        self.__run = False
+
     def _get_distance(self):
-        if settings.DEBUG:
+        if settings.USE_EMULATOR:
             return random.randint(settings.DISTANCE_LOW, settings.DISTANCE_HIGH)
         GPIO.output(self.__gpio_trigger, True)
         time.sleep(0.00001)
@@ -76,3 +84,6 @@ class UltraSonicSensor:
     @property
     def distance(self):
         return self.__distance
+
+    def get_state(self):
+        return "Front sensor distance: \t " + str(self.__distance) + "cm"

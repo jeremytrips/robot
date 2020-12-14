@@ -1,3 +1,4 @@
+import sys
 
 class bcolors:
     HEADER = '\033[95m'
@@ -36,15 +37,17 @@ class Logger:
     def log(self, *args):
         logs = bcolors.HEADER + "[ROBOT:LOG] "
         for log in args:
-            logs += log
+            logs += str(log)
         logs += bcolors.ENDC
+        sys.stdout.write("\033[K")
         print(logs)
 
     def warn(self, *args):
         logs = bcolors.WARNING + "[ROBOT:WARN] "
         for log in args:
-            logs += log
+            logs += str(log)
         logs += bcolors.ENDC
+        sys.stdout.write("\033[K")
         print(logs)
     
     def error(self, *args):
@@ -52,25 +55,29 @@ class Logger:
         for log in args:
             logs += str(log)
         logs += bcolors.ENDC
+        sys.stdout.write("\033[K")
         print(logs)
+        input("Touch any key to quit")
         sys.exit()
 
     def log_once(self, *args):
         logs = bcolors.HEADER + "[ROBOT:LOG] "
         for log in args:
-            logs += log
+            logs += str(log)
         logs += bcolors.ENDC
         if logs not in self._log_once:
             self._log_once.append(logs)
+            sys.stdout.write("\033[K")
             print(logs)
 
     def warn_once(self, *args):
         logs = bcolors.WARNING + "[ROBOT:WARN] "
         for log in args:
-            logs += log
-        logs += bcolors.ENDC
+            logs += str(log)
+        logs += bcolors.ENDC + "\n"
         if logs not in self._warn_once:
             self._warn_once.append(logs)
+            sys.stdout.write("\033[K")
             print(logs)
 
 LOG = Logger.get().log

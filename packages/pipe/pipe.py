@@ -12,7 +12,7 @@ class Pipe:
             self.__port = settings.SERIAL_PORT
             self.__baud_rate = 9600
             self.__serial = Serial(self.__port, baudrate=self.__baud_rate)
-            self.__print_serial = False
+            self.__print_serial = settings.DEBUG
         except serial.SerialException:
             self.__print_serial = True
             WARN(f"Serial port '{settings.SERIAL_PORT}' not found. Logging data on console.")

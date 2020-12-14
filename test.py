@@ -32,4 +32,10 @@ class B(object):
         print(value)
 
 if __name__=="__main__":
-    B()
+    import sys
+    for i in range(5):
+        a = "hello\n"
+        a += str(i)
+        sys.stdout.write("\x1b[1A\x1b[2k")
+        print(a, file=sys.stdout)
+        time.sleep(1)

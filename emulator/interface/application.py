@@ -34,7 +34,7 @@ class EmulatorApp(App):
     def __init__(self, robot, rotation_type):
         super(EmulatorApp, self).__init__()
         pub.subscribe(self.set_pin, "add_pin_event")
-        self.__robot_class = robot
+        self.__robot = robot
         self.__rotation_type = rotation_type
 
     def on_start(self):
@@ -42,7 +42,7 @@ class EmulatorApp(App):
         for layout in self.root.children:
             if type(layout) == MainLayout:
                 self.main_layout = layout
-        robot = self.__robot_class(self.__rotation_type)
+        robot = self.__robot
         threading.Thread(target=robot.run).start()
 
     def set_pin(self, pin):
