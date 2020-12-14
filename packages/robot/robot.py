@@ -219,8 +219,7 @@ class Robot:
         ]
         while (self.__run):
             for elem in sensor_list:
-                sys.stdout.write("\033[K")
-                print(elem.get_state())
+                sys.stdout.write(f"\033[K {elem.get_state()}")
             for i in range(len(sensor_list)):
                 sys.stdout.write("\033[F")
             time.sleep(0.2)

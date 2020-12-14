@@ -13,7 +13,6 @@ class InfraRedSensor(Sensor):
     def __init__(self, position, pin):
         self._position = position
         self._pin = pin
-        self._state = False
         GPIO.setup(self._pin, GPIO.IN)
         self.add_event_detect()
 

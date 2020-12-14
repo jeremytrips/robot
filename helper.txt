@@ -1,2 +1,0 @@
-
-scp -r robot/ pi@169.254.76.31:Desktop/robot

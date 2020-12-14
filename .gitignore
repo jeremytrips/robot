@@ -2,6 +2,8 @@
 /.vscode/
 /__pycache__/
 /.idea/
+
+helpers.txt
 *.pyc
 
 *.vs
