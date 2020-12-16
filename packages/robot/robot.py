@@ -37,7 +37,9 @@ class Robot:
         self.__pipe = Pipe()
         pub.subscribe(listener=self._line_ir_event, topicName='line_ir_sensor_event')
         pub.subscribe(listener=self._junction_ir_event_handler, topicName='junction_ir_sensor_event')
-        pub.subscribe(listener=self._us_event, topicName='us_sensor_event')
+        pub.subscribe(listener=self._us_event, topicName='us_sensor_event')        
+        time.sleep(2)
+        LOG("Waiting for serial port to open")
         if settings.DEBUG:
             Thread(target=self.debug_thread).start()
 
@@ -45,6 +47,7 @@ class Robot:
         """ 
         Main loop but do nothing as we use event to modify the state.
         """
+        self.__pipe.write("0")
         while self.__run:
             time.sleep(0.1)
         self.__front_sensor.distance
@@ -54,6 +57,7 @@ class Robot:
         Set every loop thread to flag to false
         """
         LOG("Kill main and secondary thread")
+        self.__pipe.write("6")
         self.__run = False
         self.__front_sensor.kill()
 
