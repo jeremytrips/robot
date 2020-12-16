@@ -19,6 +19,16 @@ else:
 
 GPIO.setmode(GPIO.BCM)
 
+STRAIGHT = 0
+ROTATE_RIGHT = 4
+ROTATE_LEFT = 5
+STOP = 6
+CORRECT_RIGHT = 7
+CORRECT_LEFT  = 8
+
+GO_STRAIGHT_BEFORE_TURN_TIME = 0.3
+TURN_FOR_180_DEGRE = 0.5
+
 class Robot:
 
     def __init__(self, turn_right):
@@ -36,7 +46,6 @@ class Robot:
 
         self.__pipe = Pipe()
         pub.subscribe(listener=self._line_ir_event, topicName='line_ir_sensor_event')
-        pub.subscribe(listener=self._junction_ir_event_handler, topicName='junction_ir_sensor_event')
         pub.subscribe(listener=self._us_event, topicName='us_sensor_event')        
         time.sleep(2)
         LOG("Waiting for serial port to open")
@@ -47,7 +56,7 @@ class Robot:
         """ 
         Main loop but do nothing as we use event to modify the state.
         """
-        self.__pipe.write("0")
+        self.__pipe.write(STRAIGHT)
         while self.__run:
             time.sleep(0.1)
         self.__front_sensor.distance
@@ -57,153 +66,49 @@ class Robot:
         Set every loop thread to flag to false
         """
         LOG("Kill main and secondary thread")
-        self.__pipe.write("6")
+        self.__pipe.write(STOP)
         self.__run = False
         self.__front_sensor.kill()
 
+    def remove_event_listener(self):
+        pub.unsubscribe(listener=self._line_ir_event, topicName='line_ir_sensor_event')
+    
+    def add_event_listener(self):
+        pub.subscribe(listener=self._line_ir_event, topicName='line_ir_sensor_event')
+
     def _line_ir_event(self, position):
-        # todo handle the reception of the message and react in consequence.
-        #Si "right" == True, alors xx1x et donc :
-        #0010 --- redirect vers la droite (1,0.8)
-        #0011 --- tournant a droite
-        #0111 --- tournant a droite et gauche mais incline a gauche (donc tournant a droite)
-        #1011 --- chelou, devrait pas arriver, mais -- tournant a droite
-        #1111 --- carrefour -- tournant a droite
-        #0110 --- on espere que ca arrive pas -- tout droit
-        #1110 --- chelou mais tournant a gauche si pas US
-        #1010 --- chelou mais redirect vers la droite
-        pub.unsubscribe(listener=self._junction_ir_event, topicName='line_ir_sensor_event')
-
-
-        if position == "right" :                                        #xx1x
-            if self.__right_junction_ir_sensor.state :                  #xx11
-                self.__pipe.write("2")
-            elif self.__right_junction_ir_sensor.state == False :       #xx10
-                if self.__left_line_ir_sensor.state == False :          #x010
-                    self.__pipe.write("4")
-                else :                                                  #x110
-                    if self.__left_junction_ir_sensor.state == False :  #0110
-                        self.__pipe.write("0")
-                    else :                                              #1110
-                        if self.__front_sensor.distance < 15 :
-                            self.__pipe.write("1")
-                        else : 
-                            self.__pipe.write("4")
-
-
-        #Si "left" == True, alors x1xx et donc :
-        #1100 --- Tournant a gauche -- depend du US
-        #1101 --- Chelou, devrait pas arriver -- Tournant a gauche -- depend du US
-        #1111 --- Carrefour, tournant a droite
-        #1110 --- Tournant a gauche mais incline a droite, donc depend de US et redirection ou tournant
-        #0100 --- Redirection vers la gauche
-        #0110 --- on espere que ca arrive pas -- tout droit
-        #0101 --- chelou mais tout droit
-        #0111 --- chelou mais tournant a droite en fait
-
-        elif position == "left" :                                       #x1xx
-            if self.__left_junction_ir_sensor.state :                   #11xx
-                if self.__front_sensor.distance < 15 :
-                    self.__pipe.write("1")
-                else : 
-                    if self.__right_line_ir_sensor.state == False :     #110x
-                        self.__pipe.write("5")
-                    else :                                              #111x
-                        if self.__right_junction_ir_sensor :        #1111
-                            self.__pipe.write("2")
-                        else :                                      #1110
-                            self.__pipe.write("4")
-            else :                                                      #01xx 
-                if self.__right_line_ir_sensor.state == False :         #010x
-                    if self.__right_junction_ir_sensor.state :          #0101
-                        self.__pipe.write("0")                 
-                    else :                                              #0100    
-                        self.__pipe.write("5")
-                else :                                                  #011x
-                    if self.__right_junction_ir_sensor.state :          #0111
-                        self.__pipe.write("2")
-                    else :                                              #0110
-                        self.__pipe.write("0")
-
-
+        if position == "right":
+            if self.__right_junction_ir_sensor.state:
+                # turn right
+                self.turn_right()
+            else:
+                self.__pipe.write(CORRECT_RIGHT)
+        elif position == "left":
+            if self.__left_junction_ir_sensor.state:
+                # turn left
+                self.turn_left()
+            else:
+                self.__pipe.write(CORRECT_LEFT)
         else:
-            ERROR("Unexpected argument at _line_ir_event", position)
-        pub.subscribe(listener=self._junction_ir_event, topicName='line_ir_sensor_event')
+            ERROR(f"Unexcpected argument got {position}")
+    
+    def turn_right(self):
+        self.remove_event_listener()
+        while self.__right_line_ir_sensor.state:
+            time.sleep(0.01)
+        while self.__left_line_ir_sensor.state:
+            time.sleep(0.01)
+        self.__pipe.write(STRAIGHT)
+        self.add_event_listener()
 
-    #Si left == true, alors : 1xxx
-    #1000 --- chelou, mais redirection vers la gauche (car ca implique qu'il y a un tournant a gauche percu avant le capteur central gauche, donc incline vers la droite)
-    #1001 --- zero sens, go tout droit
-    #1010 --- chelou, mais redirection vers la gauche
-    #1011 --- chelou, devrait pas arriver, mais -- tournant a droite
-    #1100 --- Tournant a gauche -- depend du US
-    #1101 --- Chelou, devrait pas arriver -- Tournant a gauche -- depend du US
-    #1110 --- Tournant a gauche mais incline a droite, donc depend de US et redirection ou tournant
-    #1111 --- Carrefour, tournant a droite
-
-    def _junction_ir_event_handler(self, position):
-        # todo handle the reception of the message and react in consequence. Rotate 90 
-        #self.__left_line_ir_sensor.remove_event()
-        #WARN("_junction_ir_event not defined yet.")
-        if position == "left" :                                                                     #1xxx
-            if self.__left_line_ir_sensor.state :                                                   #11xx
-                if self.__right_line_ir_sensor.state and self.__right_junction_ir_sensor.state :    #1111
-                    self.__pipe.write("2")
-                else :                                                                              #1100, 1101 et 1110
-                    if self.__front_sensor.distance < 15 :
-                        self.__pipe.write("1")
-                    else :
-                        if self.__right_junction_ir_sensor.state :                  #1101
-                            self.__pipe.write("5")
-                        else :                                                              
-                            if self.__right_line_ir_sensor.state  :                 #1110
-                                self.__pipe.write("4")
-                            else :                                                  #1100
-                                self.__pipe.write("0")
-            else :                                                                                  #10xx
-                if self.__right_line_ir_sensor.state :                                              #101x
-                    if self.__right_junction_ir_sensor :                                            #1011
-                        self.__pipe.write("2")
-                    else :                                                                          #1010
-                        self.__pipe.write("5")
-                else :                                                                              #100x
-                    if self.__right_junction_ir_sensor.state :                                      #1001
-                        self.__pipe.write("0")
-                    else :
-                        self.__pipe.write("5")
-        
-
-        #si right == True, alors xxx1 :
-        #0001 --- chelou, mais redirect droit 
-        #0011 --- tournant droit
-        #0111 --- tournant droit
-        #1111 --- carrefour -- tournant droit
-        #0101 --- tout droit (chelou)
-        #1001 --- zero sens go tout droit
-        #1011 --- chelou mais tournant droit
-        #1101 --- chelou mais tournant gauche (selon US)
-
-        elif position == "right" :                                    #xxx1
-            if self.__right_line_ir_sensor.state :                          #xx11
-                self.__pipe.write("2")
-            else :                                                          #xx01
-                if self.__left_line_ir_sensor.state :                           #x101
-                    if self.__left_junction_ir_sensor.state :                       #1101
-                        if self.__front_sensor.distance < 15 :
-                            self.__pipe.write("1")
-                        else : 
-                            self.__pipe.write("5")
-                    else :                                                          #0101
-                        self.__pipe.write("0")
-                else :                                                          #x001
-                    if self.__left_junction_ir_sensor.state :                       #1001
-                        self.__pipe.write("0")
-                    else :                                                          #0001
-                        self.__pipe.write("4")
-                    
-        else:
-            ERROR("Unexpected argument at _line_ir_event", position)
-        #self.__left_line_ir_sensor.add_event_detect()
-        pub.subscribe(listener=self._junction_ir_event, topicName='junction_ir_sensor_event')
+    def turn_left(self):
+        self.remove_event_listener()
+        while self.__left_line_ir_sensor.state:
+            time.sleep(0.01)
+        while self.__right_line_ir_sensor.state:
+            time.sleep(0.01)
+        self.__pipe.write(STRAIGHT)
+        self.add_event_listener()
 
     def _us_event(self):
         # todo rotate of 180 the robot
