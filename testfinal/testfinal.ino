@@ -8,7 +8,7 @@
 #define DEFAULT_SPEED 150
 #define SPEED_DELTA 30
 #define REDIRECT_TIME 150
-#define ROTATE_TIME 150
+#define ROTATE_TIME 500
 
 Adafruit_MotorShield AFMS = Adafruit_MotorShield();
 Adafruit_DCMotor *MotorR = AFMS.getMotor(4);
