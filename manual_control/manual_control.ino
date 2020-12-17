@@ -2,13 +2,13 @@
 #include <Adafruit_MotorShield.h>
 #include "utility/Adafruit_MS_PWMServoDriver.h"
 
-//#define BACKWARD FORWARD
-//#define FORWARD BACKWARD
+#define BACKWARD 1
+#define FORWARD 2
 
-#define DEFAULT_SPEED 150
+#define DEFAULT_SPEED 100
 #define SPEED_DELTA 30
 #define REDIRECT_TIME 150
-#define ROTATE_TIME 150
+#define ROTATE_TIME 500
 
 Adafruit_MotorShield AFMS = Adafruit_MotorShield();
 Adafruit_DCMotor *MotorR = AFMS.getMotor(4);
@@ -20,15 +20,19 @@ int msg;
 void setup() {
   Serial.begin(9600);           
   AFMS.begin();
-  MotorR->setSpeed(50);
-  MotorL->setSpeed(50);
+  MotorR->setSpeed(DEFAULT_SPEED);
+  MotorL->setSpeed(DEFAULT_SPEED);
+  Stop();
 }
 
 void loop() {
-  msg =readSerialPort();
+  msg = readSerialPort();
   switch (msg) {
     case 0:
       MoveForward();
+      break;
+    case 1:
+      back();
       break;
     case 4:
       rotateRight();
@@ -38,12 +42,6 @@ void loop() {
       break;  
     case 6:
       Stop();
-      break;
-    case 7:
-      redirectRight();
-      break;
-    case 8:
-      redirectLeft();
       break;
   }
 }
@@ -58,27 +56,19 @@ void rotateLeft(){
   MotorL->run(BACKWARD);
 }
 
-void redirectRight(){
-  MotorR->setSpeed(DEFAULT_SPEED);
-  MotorL->setSpeed(DEFAULT_SPEED-SPEED_DELTA);
-  delay(REDIRECT_TIME);
-  MoveForward();
-}
-
-
-void redirectLeft(){
-  MotorR->setSpeed(DEFAULT_SPEED-SPEED_DELTA);
-  MotorL->setSpeed(DEFAULT_SPEED);
-  delay(REDIRECT_TIME);
-  MoveForward();
-}
-
 
 void MoveForward(){
   MotorR->setSpeed(DEFAULT_SPEED);
   MotorL->setSpeed(DEFAULT_SPEED);
-  MotorR->run(FROWARD)
-  MotorL->run(FROWARD)
+  MotorR->run(FORWARD);
+  MotorL->run(FORWARD);
+}
+
+void back(){
+  MotorR->setSpeed(DEFAULT_SPEED);
+  MotorL->setSpeed(DEFAULT_SPEED);
+  MotorR->run(BACKWARD);
+  MotorL->run(BACKWARD);
 }
 
 void Stop(){

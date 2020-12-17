@@ -30,9 +30,8 @@ class UltraSonicSensor(Sensor):
     
     def measure(self):
         while self.__run:
-            self._get_average()
-            if self.__distance < 5 :
-                pub.sendMessage("us_sensor_event")
+            self._get_average()  
+            pub.sendMessage("us_sensor_event", distance=self.__distance)
             time.sleep(0.2)
 
     def kill(self):
@@ -76,9 +75,6 @@ class UltraSonicSensor(Sensor):
         self.__distance = sum(sorted(listePourMoyenne)[2:-2])/(len(listePourMoyenne)-4)
         
     #petite note ici, List.sort() m'a deja renvoye None, sorted(List) jamais
-
-    def _us_sensor_event(self):
-        pub.sendMessage("us_sensor_event")
 
     @property
     def distance(self):
