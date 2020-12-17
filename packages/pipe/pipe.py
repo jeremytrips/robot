@@ -2,7 +2,7 @@ import settings
 
 import serial
 from serial import Serial
-from packages.logger.logger import WARN, LOG
+from packages.logger.logger import WARN, LOG, WARN_ONCE
 
 
 class Pipe:
