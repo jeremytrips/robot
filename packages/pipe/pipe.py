@@ -18,7 +18,8 @@ class Pipe:
             WARN(f"Serial port '{settings.SERIAL_PORT}' not found. Logging data on console.")
 
     def write(self, message):
-        str(message) += settings.END_CHAR
+        message = str(message)
+        message += settings.END_CHAR
         if self.__print_serial:
             LOG("Pipe: ", message)
         if self.__serial.isOpen():
