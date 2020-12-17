@@ -25,4 +25,4 @@ class Pipe:
         if self.__serial.isOpen():
             self.__serial.write(message.encode('utf-8'))
         else:
-            WARN_ONCE(r"/!\    Serial port not open    /!\")
+            WARN_ONCE(r"/!\\    Serial port not open    /!\\")

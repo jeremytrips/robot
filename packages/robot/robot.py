@@ -72,8 +72,6 @@ class Robot:
         #0110 --- on espere que ca arrive pas -- tout droit
         #1110 --- chelou mais tournant a gauche si pas US
         #1010 --- chelou mais redirect vers la droite
-        pub.unsubscribe(listener=self._junction_ir_event, topicName='line_ir_sensor_event')
-
 
         if position == "right" :                                        #xx1x
             if self.__right_junction_ir_sensor.state :                  #xx11
@@ -128,7 +126,6 @@ class Robot:
 
         else:
             ERROR("Unexpected argument at _line_ir_event", position)
-        pub.subscribe(listener=self._junction_ir_event, topicName='line_ir_sensor_event')
 
     #Si left == true, alors : 1xxx
     #1000 --- chelou, mais redirection vers la gauche (car ca implique qu'il y a un tournant a gauche percu avant le capteur central gauche, donc incline vers la droite)

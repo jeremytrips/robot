@@ -1,6 +1,6 @@
 END_CHAR = "%"
 
-SERIAL_PORT = "ttyACM0"
+SERIAL_PORT = "/dev/ttyACM1"
 
 DEBUG = True
 USE_EMULATOR = False
