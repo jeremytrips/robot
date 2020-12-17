@@ -77,6 +77,9 @@ class Robot:
         pub.subscribe(listener=self._line_ir_event, topicName='line_ir_sensor_event')
 
     def _line_ir_event(self, position):
+        """
+            Verifier si c'est possible que les deux capteurs ne soient pas ensemble sur la ligne noir.
+        """
         if position == "right":
             if self.__right_junction_ir_sensor.state:
                 # turn right
@@ -94,6 +97,7 @@ class Robot:
     
     def turn_right(self):
         self.remove_event_listener()
+        self.__pipe.write(ROTATE_RIGHT)
         while self.__right_line_ir_sensor.state:
             time.sleep(0.01)
         while self.__left_line_ir_sensor.state:
@@ -103,6 +107,7 @@ class Robot:
 
     def turn_left(self):
         self.remove_event_listener()
+        self.__pipe.write(ROTATE_LEFT)
         while self.__left_line_ir_sensor.state:
             time.sleep(0.01)
         while self.__right_line_ir_sensor.state:
