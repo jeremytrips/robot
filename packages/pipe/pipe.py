@@ -2,7 +2,7 @@ import settings
 
 import serial
 from serial import Serial
-from packages.logger.logger import WARN, LOG
+from packages.logger.logger import WARN, LOG, WARN_ONCE
 
 
 class Pipe:
@@ -21,5 +21,7 @@ class Pipe:
         str(message) += settings.END_CHAR
         if self.__print_serial:
             LOG("Pipe: ", message)
-        else:
+        if self.__serial.isOpen():
             self.__serial.write(message.encode('utf-8'))
+        else:
+            WARN_ONCE(r"/!\    Serial port not open    /!\")
