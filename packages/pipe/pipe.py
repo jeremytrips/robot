@@ -21,5 +21,7 @@ class Pipe:
         message += settings.END_CHAR
         if self.__print_serial:
             LOG("Pipe: ", message)
-        else:
+        if self.__serial.isOpen():
             self.__serial.write(message.encode('utf-8'))
+        else:
+            WARN_ONCE(r"/!\    Serial port not open    /!\")
