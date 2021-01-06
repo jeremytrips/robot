@@ -19,6 +19,16 @@ else:
 
 GPIO.setmode(GPIO.BCM)
 
+STRAIGHT = 0
+ROTATE_RIGHT = 4
+ROTATE_LEFT = 5
+STOP = 6
+CORRECT_RIGHT = 7
+CORRECT_LEFT  = 8
+
+GO_STRAIGHT_BEFORE_TURN_TIME = 0.3
+TURN_FOR_180_DEGRE = 0.5
+
 class Robot:
 
     def __init__(self, turn_right):
@@ -36,18 +46,17 @@ class Robot:
 
         self.__pipe = Pipe()
         pub.subscribe(listener=self._line_ir_event, topicName='line_ir_sensor_event')
-        pub.subscribe(listener=self._junction_ir_event_handler, topicName='junction_ir_sensor_event')
         pub.subscribe(listener=self._us_event, topicName='us_sensor_event')        
         time.sleep(2)
         LOG("Waiting for serial port to open")
-        if settings.DEBUG:
+        if settings.DEBUG and not settings.USE_EMULATOR:
             Thread(target=self.debug_thread).start()
 
     def run(self):
         """ 
         Main loop but do nothing as we use event to modify the state.
         """
-        self.__pipe.write("0")
+        self.__pipe.write(STRAIGHT)
         while self.__run:
             time.sleep(0.1)
         self.__front_sensor.distance
@@ -57,7 +66,7 @@ class Robot:
         Set every loop thread to flag to false
         """
         LOG("Kill main and secondary thread")
-        self.__pipe.write("6")
+        self.__pipe.write(STOP)
         self.__run = False
         self.__front_sensor.kill()
 
@@ -124,6 +133,22 @@ class Robot:
                         self.__pipe.write("0")
 
 
+    def _line_ir_event(self, position):
+        """
+            Verifier si c'est possible que les deux capteurs ne soient pas ensemble sur la ligne noir.
+        """
+        if position == "right":
+            if self.__right_junction_ir_sensor.state:
+                # turn right
+                self.turn_right()
+            else:
+                self.__pipe.write(CORRECT_RIGHT)
+        elif position == "left":
+            if self.__left_junction_ir_sensor.state:
+                # turn left
+                self.turn_left()
+            else:
+                self.__pipe.write(CORRECT_LEFT)
         else:
             ERROR("Unexpected argument at _line_ir_event", position)
 

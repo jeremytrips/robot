@@ -8,6 +8,7 @@ from packages.logger.logger import WARN, LOG, WARN_ONCE
 class Pipe:
 
     def __init__(self):
+        self.__connected = False
         try:
             self.__port = settings.SERIAL_PORT
             self.__baud_rate = 9600
