@@ -2,6 +2,11 @@
 #include <Adafruit_MotorShield.h>
 #include "utility/Adafruit_MS_PWMServoDriver.h"
 
+/*
+ * This script was used to check wether dc motors where
+ * working correctly.
+ */
+
 // Décommenter si inverser
 //#define BACKWARD FORWARD
 //#define FORWARD BACKWARD

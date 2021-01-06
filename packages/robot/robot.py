@@ -49,7 +49,7 @@ class Robot:
         pub.subscribe(listener=self._us_event, topicName='us_sensor_event')        
         time.sleep(2)
         LOG("Waiting for serial port to open")
-        if settings.DEBUG:
+        if settings.DEBUG and not settings.USE_EMULATOR:
             Thread(target=self.debug_thread).start()
 
     def run(self):

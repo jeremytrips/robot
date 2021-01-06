@@ -5,6 +5,10 @@
 //#define BACKWARD FORWARD
 //#define FORWARD BACKWARD
 
+/*
+ * Main script of arduino
+ */
+
 #define DEFAULT_SPEED 150
 #define SPEED_DELTA 30
 #define REDIRECT_TIME 150
