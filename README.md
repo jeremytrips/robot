@@ -21,9 +21,3 @@ The code used an event driven architecture. An event was fire each time the ir-s
 
 * **Vincent Fischer** - https://github.com/Division01
 * **Jeremy Trips**
-
-See also the list of [contributors](https://github.com/your/project/contributors) who participated in this project.
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
